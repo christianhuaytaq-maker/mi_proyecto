@@ -1,17 +1,54 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const formulario = document.querySelector(".formulario");
+    const formularioPedido =
+        document.querySelector(".formulario");
 
-    if (formulario) {
+    if (formularioPedido) {
 
-        formulario.addEventListener("submit", function () {
+        formularioPedido.addEventListener("submit", function () {
 
-            const boton = formulario.querySelector(".boton-enviar");
+            const boton =
+                formularioPedido.querySelector(".boton-enviar");
 
-            boton.textContent = "Enviando...";
+            if (boton) {
+                boton.textContent = "Enviando...";
+            }
 
         });
 
     }
 
 });
+
+
+function mostrarFormularioPlato() {
+
+    const formulario =
+        document.getElementById("formulario-plato");
+
+    if (formulario) {
+
+        formulario.style.display = "block";
+
+        formulario.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+    }
+
+}
+
+
+function ocultarFormularioPlato() {
+
+    const formulario =
+        document.getElementById("formulario-plato");
+
+    if (formulario) {
+
+        formulario.style.display = "none";
+
+    }
+
+}

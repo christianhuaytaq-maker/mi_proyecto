@@ -683,3 +683,125 @@ footer p:last-child {
         font-size: 21px;
     }
 }
+/* =========================================
+   FORMULARIO NUEVO PLATO
+========================================= */
+
+.boton-agregar {
+    border: none;
+    background: #287a55;
+    color: white;
+    padding: 14px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.boton-agregar:hover {
+    background: #174d3b;
+}
+
+
+.formulario-nuevo-plato {
+    max-width: 700px;
+    margin: 25px auto 40px;
+    padding: 30px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(23, 77, 59, 0.15);
+    border: 1px solid #d9e2db;
+}
+
+
+.formulario-nuevo-plato h2 {
+    text-align: center;
+    color: #174d3b;
+    margin-bottom: 25px;
+}
+
+
+.formulario-nuevo-plato .campo {
+    margin-bottom: 18px;
+}
+
+
+.formulario-nuevo-plato label {
+    display: block;
+    margin-bottom: 7px;
+    color: #174d3b;
+    font-weight: bold;
+}
+
+
+.formulario-nuevo-plato input,
+.formulario-nuevo-plato textarea {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d9e2db;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+}
+
+
+.formulario-nuevo-plato textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+
+.formulario-nuevo-plato input:focus,
+.formulario-nuevo-plato textarea:focus {
+    border-color: #287a55;
+    box-shadow: 0 0 0 3px rgba(40, 122, 85, 0.12);
+}
+
+
+.botones-formulario {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+
+.boton-cancelar,
+.boton-guardar {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
+.boton-cancelar {
+    background: #e5e5e5;
+    color: #333;
+}
+
+
+.boton-guardar {
+    background: #287a55;
+    color: white;
+}
+
+
+.boton-guardar:hover {
+    background: #174d3b;
+}
+
+
+@media (max-width: 700px) {
+
+    .botones-formulario {
+        flex-direction: column;
+    }
+
+    .boton-agregar {
+        width: 100%;
+    }
+
+}

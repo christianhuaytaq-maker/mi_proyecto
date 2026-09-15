@@ -1,0 +1,10 @@
+[
+    {
+        "id": 21,
+        "nombre": "Pollo Campestre",
+        "descripcion": "Pollo preparado al estilo campestre",
+        "precio": 25,
+        "categoria": "Platos típicos",
+        "imagen": "plato_123.jpg"
+    }
+]
