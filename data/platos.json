@@ -1,0 +1,10 @@
+[
+    {
+        "id": 21,
+        "nombre": "caldo de gallina",
+        "descripcion": "caldo de gallina negra",
+        "precio": 11.98,
+        "categoria": "entrada",
+        "imagen": "default.jpg"
+    }
+]

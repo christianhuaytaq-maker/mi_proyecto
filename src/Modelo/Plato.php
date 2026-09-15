@@ -53,13 +53,13 @@ class Plato
             'categoria' => 'Entradas',
             'imagen' => 'caldo.jpg'
         ],
-                [
+        [
             'id' => 9,
             'nombre' => 'Ceviche de Trucha',
             'descripcion' => 'Fresco ceviche de trucha con limón, cebolla y ají limo.',
             'precio' => 32.00,
             'categoria' => 'Platos típicos',
-            'imagen' => 'ceviche.jpg' // Asegúrate de tener esta imagen
+            'imagen' => 'ceviche.jpg'
         ],
         [
             'id' => 10,
@@ -85,7 +85,7 @@ class Plato
             'categoria' => 'Bebidas',
             'imagen' => 'bebida.jpg'
         ],
-                [
+        [
             'id' => 12,
             'nombre' => 'Chicha Morada',
             'descripcion' => 'Refrescante chicha morada preparada con maíz morado y frutas.',
@@ -109,7 +109,7 @@ class Plato
             'categoria' => 'Bebidas',
             'imagen' => 'cafe.jpg'
         ],
-                [
+        [
             'id' => 16,
             'nombre' => 'Cerveza Pilsen (650ml)',
             'descripcion' => 'Cerveza rubia bien fría, ideal para acompañar la parrilla.',
@@ -151,30 +151,347 @@ class Plato
         ]
     ];
 
+
+    /*
+     * =========================================================
+     * OBTENER TODOS LOS PLATOS
+     * =========================================================
+     */
     public function obtenerPlatos(): array
     {
-        return $this->platos;
+        $archivo = $this->rutaArchivo();
+
+
+        if (!file_exists($archivo)) {
+            return $this->platos;
+        }
+
+
+        $contenido = file_get_contents($archivo);
+
+
+        if ($contenido === false || trim($contenido) === '') {
+            return $this->platos;
+        }
+
+
+        $guardados = json_decode(
+            $contenido,
+            true
+        );
+
+
+        if (!is_array($guardados)) {
+            return $this->platos;
+        }
+
+
+        return array_merge(
+            $this->platos,
+            $guardados
+        );
     }
 
-    public function buscar(string $texto = '', string $categoria = ''): array
-    {
-        return array_values(array_filter($this->platos, function ($plato) use ($texto, $categoria) {
 
-            $coincideTexto = $texto === ''
-                || stripos($plato['nombre'], $texto) !== false
-                || stripos($plato['descripcion'], $texto) !== false;
+    /*
+     * =========================================================
+     * BUSCAR
+     * =========================================================
+     */
+    public function buscar(
+        string $texto = '',
+        string $categoria = ''
+    ): array {
 
-            $coincideCategoria = $categoria === ''
-                || $plato['categoria'] === $categoria;
+        $platos = $this->obtenerPlatos();
 
-            return $coincideTexto && $coincideCategoria;
-        }));
+
+        return array_values(
+            array_filter(
+                $platos,
+                function ($plato) use ($texto, $categoria) {
+
+                    $coincideTexto =
+                        $texto === ''
+                        || stripos(
+                            $plato['nombre'],
+                            $texto
+                        ) !== false
+                        || stripos(
+                            $plato['descripcion'],
+                            $texto
+                        ) !== false;
+
+
+                    $coincideCategoria =
+                        $categoria === ''
+                        || $plato['categoria'] === $categoria;
+
+
+                    return
+                        $coincideTexto
+                        && $coincideCategoria;
+                }
+            )
+        );
     }
 
+
+    /*
+     * =========================================================
+     * OBTENER CATEGORÍAS
+     * =========================================================
+     */
     public function obtenerCategorias(): array
     {
-        return array_values(array_unique(
-            array_column($this->platos, 'categoria')
-        ));
+        $platos =
+            $this->obtenerPlatos();
+
+
+        return array_values(
+            array_unique(
+                array_column(
+                    $platos,
+                    'categoria'
+                )
+            )
+        );
+    }
+
+
+    /*
+     * =========================================================
+     * GUARDAR NUEVO PLATO
+     * =========================================================
+     */
+    public function agregarPlato(
+        string $nombre,
+        string $descripcion,
+        float $precio,
+        string $categoria,
+        string $imagen
+    ): bool {
+
+        /*
+         * Ruta absoluta de data/platos.json
+         */
+        $carpeta =
+            dirname(
+                __DIR__,
+                2
+            )
+            . DIRECTORY_SEPARATOR
+            . 'data';
+
+
+        $archivo =
+            $carpeta
+            . DIRECTORY_SEPARATOR
+            . 'platos.json';
+
+
+        /*
+         * Crear carpeta data si no existe.
+         */
+        if (!is_dir($carpeta)) {
+
+            if (!mkdir(
+                $carpeta,
+                0777,
+                true
+            )) {
+                return false;
+            }
+        }
+
+
+        /*
+         * Si el archivo no existe,
+         * crearlo con un arreglo vacío.
+         */
+        if (!file_exists($archivo)) {
+
+            $creado =
+                file_put_contents(
+                    $archivo,
+                    "[]"
+                );
+
+            if ($creado === false) {
+                return false;
+            }
+        }
+
+
+        /*
+         * Leer archivo.
+         */
+        $contenido =
+            file_get_contents(
+                $archivo
+            );
+
+
+        if ($contenido === false) {
+            return false;
+        }
+
+
+        /*
+         * Convertir JSON a arreglo.
+         */
+        $guardados =
+            json_decode(
+                $contenido,
+                true
+            );
+
+
+        /*
+         * Si está vacío o tiene un JSON inválido,
+         * comenzamos con un arreglo vacío.
+         */
+        if (!is_array($guardados)) {
+            $guardados = [];
+        }
+
+
+        /*
+         * Obtener IDs existentes.
+         */
+        $todosLosPlatos =
+            array_merge(
+                $this->platos,
+                $guardados
+            );
+
+
+        $ids =
+            array_column(
+                $todosLosPlatos,
+                'id'
+            );
+
+
+        /*
+         * Calcular nuevo ID.
+         */
+        $nuevoId =
+            empty($ids)
+            ? 1
+            : max($ids) + 1;
+
+
+        /*
+         * Crear nuevo plato.
+         */
+        $nuevoPlato = [
+            'id' => $nuevoId,
+            'nombre' => $nombre,
+            'descripcion' => $descripcion,
+            'precio' => $precio,
+            'categoria' => $categoria,
+            'imagen' => $imagen
+        ];
+
+
+        /*
+         * Agregar nuevo plato.
+         */
+        $guardados[] =
+            $nuevoPlato;
+
+
+        /*
+         * Convertir a JSON.
+         */
+        $json =
+            json_encode(
+                $guardados,
+                JSON_PRETTY_PRINT
+                | JSON_UNESCAPED_UNICODE
+            );
+
+
+        if ($json === false) {
+            return false;
+        }
+
+
+        /*
+         * Guardar JSON.
+         */
+        $resultado =
+            file_put_contents(
+                $archivo,
+                $json,
+                LOCK_EX
+            );
+
+
+        if ($resultado === false) {
+            return false;
+        }
+
+
+        /*
+         * COMPROBAR QUE REALMENTE SE GUARDÓ.
+         */
+        if (!file_exists($archivo)) {
+            return false;
+        }
+
+
+        $verificacion =
+            file_get_contents(
+                $archivo
+            );
+
+
+        if (
+            $verificacion === false
+            || trim($verificacion) === ''
+        ) {
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    /*
+     * =========================================================
+     * GUARDAR
+     * =========================================================
+     */
+    public function guardar(array $datos): bool
+    {
+        return $this->agregarPlato(
+            $datos['nombre'],
+            $datos['descripcion'],
+            (float) $datos['precio'],
+            $datos['categoria'],
+            $datos['imagen']
+        );
+    }
+
+
+    /*
+     * =========================================================
+     * RUTA DEL JSON
+     * =========================================================
+     */
+    private function rutaArchivo(): string
+    {
+        return
+            dirname(
+                __DIR__,
+                2
+            )
+            . DIRECTORY_SEPARATOR
+            . 'data'
+            . DIRECTORY_SEPARATOR
+            . 'platos.json';
     }
 }

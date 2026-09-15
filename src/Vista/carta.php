@@ -2,281 +2,528 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>El Encanto Campestre - Carta Digital</title>
 
     <link rel="stylesheet" href="css/estilos.css">
+
 </head>
 
 <body>
 
-    <header class="hero">
+<header class="hero">
 
-        <div class="hero-contenido">
+    <div class="hero-contenido">
 
-            <p class="subtitulo">RESTAURANTE CAMPESTRE</p>
+        <p class="subtitulo">
+            RESTAURANTE CAMPESTRE
+        </p>
 
-            <h1>El Encanto Campestre</h1>
+        <h1>
+            El Encanto Campestre
+        </h1>
 
-            <p>
-                Sabores tradicionales en un ambiente natural
-            </p>
+        <p>
+            Sabores tradicionales en un ambiente natural
+        </p>
 
-            <a href="#carta" class="boton">
-                Ver nuestra carta
-            </a>
+        <a href="#carta" class="boton">
+            Ver nuestra carta
+        </a>
+
+    </div>
+
+</header>
+
+
+<main>
+
+<section id="carta" class="contenedor">
+
+    <div class="titulo-seccion">
+
+        <h2>
+            Nuestra Carta
+        </h2>
+
+        <p>
+            Disfruta nuestros platos preparados con ingredientes
+            seleccionados y el auténtico sabor campestre.
+        </p>
+
+    </div>
+
+
+    <!-- BUSCADOR -->
+
+    <form
+        method="GET"
+        action="index.php"
+        class="buscador"
+    >
+
+        <input
+            type="text"
+            name="buscar"
+            placeholder="Buscar un plato..."
+            value="<?= htmlspecialchars($buscar ?? '') ?>"
+        >
+
+
+        <select name="categoria">
+
+            <option value="">
+                Todas las categorías
+            </option>
+
+            <?php foreach ($categorias as $cat): ?>
+
+                <option
+                    value="<?= htmlspecialchars($cat) ?>"
+                    <?= (($categoria ?? '') === $cat) ? 'selected' : '' ?>
+                >
+
+                    <?= htmlspecialchars($cat) ?>
+
+                </option>
+
+            <?php endforeach; ?>
+
+        </select>
+
+
+        <button type="submit">
+            Buscar
+        </button>
+
+
+        <a href="index.php" class="limpiar">
+            Limpiar
+        </a>
+
+
+        <button
+            type="button"
+            class="boton-agregar"
+            onclick="mostrarFormularioPlato()"
+        >
+            + Agregar plato nuevo
+        </button>
+
+    </form>
+
+
+    <!-- MENSAJE -->
+
+    <?php if (!empty($mensaje)): ?>
+
+        <div class="mensaje">
+
+            <?= htmlspecialchars($mensaje) ?>
 
         </div>
 
-    </header>
+    <?php endif; ?>
 
 
-    <main>
+    <!-- FORMULARIO NUEVO PLATO -->
 
-        <section id="carta" class="contenedor">
+    <div
+        id="formulario-plato"
+        class="formulario-nuevo-plato"
+        style="display: none;"
+    >
 
-            <div class="titulo-seccion">
+        <h2>
+            Agregar nuevo plato
+        </h2>
 
-                <h2>Nuestra Carta</h2>
 
-                <p>
-                    Disfruta nuestros platos preparados con ingredientes
-                    seleccionados y el auténtico sabor campestre.
-                </p>
+        <form
+            method="POST"
+            action="index.php"
+            enctype="multipart/form-data"
+        >
+
+            <input
+                type="hidden"
+                name="accion"
+                value="agregar_plato"
+            >
+
+
+            <div class="campo">
+
+                <label for="nombre_nuevo">
+                    Nombre del plato
+                </label>
+
+                <input
+                    type="text"
+                    id="nombre_nuevo"
+                    name="nombre"
+                    placeholder="Ejemplo: Pollo Campestre"
+                    required
+                >
 
             </div>
 
 
-            <!-- FORMULARIO GET -->
+            <div class="campo">
 
-            <form method="GET" action="index.php" class="buscador">
+                <label for="categoria_nueva">
+                    Categoría
+                </label>
 
                 <input
                     type="text"
-                    name="buscar"
-                    placeholder="Buscar un plato..."
-                    value="<?= htmlspecialchars($buscar) ?>"
+                    id="categoria_nueva"
+                    name="categoria"
+                    placeholder="Ejemplo: Platos típicos"
+                    required
                 >
 
-                <select name="categoria">
+            </div>
+
+
+            <div class="campo">
+
+                <label for="precio_nuevo">
+                    Precio
+                </label>
+
+                <input
+                    type="number"
+                    id="precio_nuevo"
+                    name="precio"
+                    step="0.01"
+                    min="0.01"
+                    placeholder="Ejemplo: 25.00"
+                    required
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="descripcion_nueva">
+                    Descripción
+                </label>
+
+                <textarea
+                    id="descripcion_nueva"
+                    name="descripcion"
+                    placeholder="Descripción del plato"
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="imagen_nueva">
+                    Imagen del plato
+                </label>
+
+                <input
+                    type="file"
+                    id="imagen_nueva"
+                    name="imagen"
+                    accept=".jpg,.jpeg,.png,.gif,.webp"
+                >
+
+            </div>
+
+
+            <div class="botones-formulario">
+
+                <button
+                    type="button"
+                    class="boton-cancelar"
+                    onclick="ocultarFormularioPlato()"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="boton-guardar"
+                >
+                    Guardar
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- CARTA DE PLATOS -->
+
+    <div class="grid-platos">
+
+        <?php if (empty($platos)): ?>
+
+            <div class="sin-resultados">
+
+                <h3>
+                    No encontramos platos
+                </h3>
+
+                <p>
+                    Intenta realizar otra búsqueda.
+                </p>
+
+            </div>
+
+        <?php else: ?>
+
+
+            <?php foreach ($platos as $plato): ?>
+
+                <article class="plato">
+
+
+                    <!-- IMAGEN -->
+
+                    <div class="imagen-plato">
+
+                        <?php
+
+                        $imagen = $plato['imagen'];
+
+                        /*
+                         * Los platos agregados desde el formulario
+                         * comienzan con "plato_".
+                         */
+
+                        if (
+                            str_starts_with(
+                                $imagen,
+                                'plato_'
+                            )
+                        ) {
+
+                            $rutaImagen =
+                                'uploads/' . $imagen;
+
+                        } else {
+
+                            $rutaImagen =
+                                'img/' . $imagen;
+
+                        }
+
+                        ?>
+
+
+                        <img
+                            src="<?= htmlspecialchars($rutaImagen) ?>"
+                            alt="<?= htmlspecialchars($plato['nombre']) ?>"
+                            onerror="this.style.display='none';"
+                        >
+
+                    </div>
+
+
+                    <!-- INFORMACIÓN -->
+
+                    <div class="contenido-plato">
+
+
+                        <span class="categoria">
+
+                            <?= htmlspecialchars(
+                                $plato['categoria']
+                            ) ?>
+
+                        </span>
+
+
+                        <h3>
+
+                            <?= htmlspecialchars(
+                                $plato['nombre']
+                            ) ?>
+
+                        </h3>
+
+
+                        <p>
+
+                            <?= htmlspecialchars(
+                                $plato['descripcion']
+                            ) ?>
+
+                        </p>
+
+
+                        <strong class="precio">
+
+                            S/
+                            <?= number_format(
+                                (float) $plato['precio'],
+                                2
+                            ) ?>
+
+                        </strong>
+
+
+                    </div>
+
+                </article>
+
+            <?php endforeach; ?>
+
+
+        <?php endif; ?>
+
+    </div>
+
+</section>
+
+
+<!-- PEDIDOS -->
+
+<section class="pedido">
+
+    <div class="contenedor">
+
+        <div class="titulo-seccion">
+
+            <h2>
+                Realiza tu pedido
+            </h2>
+
+            <p>
+                Completa el formulario y solicita tu plato favorito.
+            </p>
+
+        </div>
+
+
+        <form
+            method="POST"
+            action="index.php"
+            class="formulario"
+        >
+
+
+            <div class="campo">
+
+                <label for="nombre">
+                    Nombre del cliente
+                </label>
+
+                <input
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    placeholder="Ingrese su nombre"
+                    required
+                >
+
+            </div>
+
+
+            <div class="campo">
+
+                <label for="plato">
+                    Seleccione un plato
+                </label>
+
+                <select
+                    id="plato"
+                    name="plato"
+                    required
+                >
 
                     <option value="">
-                        Todas las categorías
+                        Seleccione un plato
                     </option>
 
-                    <?php foreach ($categorias as $cat): ?>
+
+                    <?php foreach ($todosLosPlatos as $item): ?>
 
                         <option
-                            value="<?= htmlspecialchars($cat) ?>"
-                            <?= $categoria === $cat ? 'selected' : '' ?>
+                            value="<?= htmlspecialchars($item['nombre']) ?>"
                         >
-                            <?= htmlspecialchars($cat) ?>
+
+                            <?= htmlspecialchars($item['nombre']) ?>
+
+                            -
+                            S/
+                            <?= number_format(
+                                (float) $item['precio'],
+                                2
+                            ) ?>
+
                         </option>
 
                     <?php endforeach; ?>
 
                 </select>
 
-                <button type="submit">
-                    Buscar
-                </button>
-
-                <a href="index.php" class="limpiar">
-                    Limpiar
-                </a>
-
-            </form>
+            </div>
 
 
-            <!-- MENÚ DIGITAL -->
+            <div class="campo">
 
-            <div class="grid-platos">
+                <label for="cantidad">
+                    Cantidad
+                </label>
 
-                <?php if (empty($platos)): ?>
-
-                    <div class="sin-resultados">
-
-                        <h3>No encontramos platos</h3>
-
-                        <p>
-                            Intenta realizar otra búsqueda.
-                        </p>
-
-                    </div>
-
-                <?php else: ?>
-
-                    <?php foreach ($platos as $plato): ?>
-
-                        <article class="plato">
-
-                            <div class="imagen-plato">
-
-                                <img
-                                    src="img/<?= htmlspecialchars($plato['imagen']) ?>"
-                                    alt="<?= htmlspecialchars($plato['nombre']) ?>"
-                                >
-
-                            </div>
-
-                            <div class="contenido-plato">
-
-                                <span class="categoria">
-                                    <?= htmlspecialchars($plato['categoria']) ?>
-                                </span>
-
-                                <h3>
-                                    <?= htmlspecialchars($plato['nombre']) ?>
-                                </h3>
-
-                                <p>
-                                    <?= htmlspecialchars($plato['descripcion']) ?>
-                                </p>
-
-                                <strong class="precio">
-                                    S/ <?= number_format($plato['precio'], 2) ?>
-                                </strong>
-
-                            </div>
-
-                        </article>
-
-                    <?php endforeach; ?>
-
-                <?php endif; ?>
+                <input
+                    type="number"
+                    id="cantidad"
+                    name="cantidad"
+                    min="1"
+                    value="1"
+                    required
+                >
 
             </div>
 
-        </section>
+
+            <button
+                type="submit"
+                class="boton-enviar"
+            >
+                Enviar pedido
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+</main>
 
 
-        <!-- FORMULARIO POST -->
+<footer>
 
-        <section class="pedido">
+    <p>
+        © <?= date('Y') ?>
+        El Encanto Campestre
+    </p>
 
-            <div class="contenedor">
+    <p>
+        Restaurante campestre - Carta Digital
+    </p>
 
-                <div class="titulo-seccion">
-
-                    <h2>Realiza tu pedido</h2>
-
-                    <p>
-                        Completa el formulario y solicita tu plato favorito.
-                    </p>
-
-                </div>
+</footer>
 
 
-                <?php if ($mensaje !== ''): ?>
-
-                    <div class="mensaje">
-                        <?= htmlspecialchars($mensaje) ?>
-                    </div>
-
-                <?php endif; ?>
-
-
-                <form method="POST" action="index.php" class="formulario">
-
-                    <div class="campo">
-
-                        <label for="nombre">
-                            Nombre del cliente
-                        </label>
-
-                        <input
-                            type="text"
-                            id="nombre"
-                            name="nombre"
-                            placeholder="Ingrese su nombre"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="campo">
-
-                        <label for="plato">
-                            Seleccione un plato
-                        </label>
-
-                        <select
-                            id="plato"
-                            name="plato"
-                            required
-                        >
-
-                            <option value="">
-                                Seleccione un plato
-                            </option>
-
-                            <?php foreach ($todosLosPlatos as $item): ?>
-
-                                <option
-                                    value="<?= htmlspecialchars($item['nombre']) ?>"
-                                >
-                                    <?= htmlspecialchars($item['nombre']) ?>
-                                    - S/ <?= number_format($item['precio'], 2) ?>
-                                </option>
-
-                            <?php endforeach; ?>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="campo">
-
-                        <label for="cantidad">
-                            Cantidad
-                        </label>
-
-                        <input
-                            type="number"
-                            id="cantidad"
-                            name="cantidad"
-                            min="1"
-                            value="1"
-                            required
-                        >
-
-                    </div>
-
-
-                    <button
-                        type="submit"
-                        class="boton-enviar"
-                    >
-                        Enviar pedido
-                    </button>
-
-                </form>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <footer>
-
-        <p>
-            © <?= date('Y') ?> El Encanto Campestre
-        </p>
-
-        <p>
-            Restaurante campestre - Carta Digital
-        </p>
-
-    </footer>
-
-
-    <script src="js/app.js"></script>
+<script src="js/app.js"></script>
 
 </body>
 
